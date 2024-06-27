@@ -2,7 +2,8 @@ import pandas as pd
 import streamlit as st
 
 # Chargement des données
-url = 'https://raw.githubusercontent.com/MaskiVal/DataSets/main/cancer_breast.csv'
+#url = 'https://raw.githubusercontent.com/MaskiVal/DataSets/main/cancer_breast.csv'
+url ='https://raw.githubusercontent.com/phbarbe/PrediHealth/main/cancer_breast.csv'
 breast_cancer = pd.read_csv(url)
 
 # Colonnes à supprimer
