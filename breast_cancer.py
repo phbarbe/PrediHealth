@@ -1,48 +1,59 @@
+import pandas as pd
 import streamlit as st
+
+# Chargement des données
+url = 'https://raw.githubusercontent.com/MaskiVal/DataSets/main/cancer_breast.csv'
+breast_cancer = pd.read_csv(url)
+
+# Colonnes à supprimer
+columns_to_drop = ['id', 'Unnamed: 32', 'diagnosis']
+
+# Vérifier si les colonnes existent avant de les supprimer
+columns_to_drop = [col for col in columns_to_drop if col in breast_cancer.columns]
+
+# Liste des colonnes à conserver
+columns_list = [col for col in breast_cancer.columns if col not in columns_to_drop]
+
+def get_quantile_value(df, column, quantile):
+    """
+    Cette fonction retourne la valeur du quantile spécifié pour une colonne donnée du DataFrame.
+    """
+    return df[df['diagnosis'] == 'B'].drop(columns_to_drop, axis=1).quantile(quantile)[column]
+
+def create_number_input(label, df, column, quantile=0.5, min_value=0.0, format="%.4f"):
+    """
+    Crée un champ de saisie pour un nombre dans Streamlit avec une valeur par défaut basée sur le quantile spécifié.
+    """
+    value = get_quantile_value(df, column, quantile)
+    return st.number_input(label, min_value=min_value, value=value, format=format)
+
+def display_statistics(df, column, label):
+    """
+    Cette fonction affiche les statistiques (Q1, médiane, Q3) pour une colonne donnée.
+    """
+    Q1 = get_quantile_value(df, column, 0.25)
+    median = get_quantile_value(df, column, 0.5)
+    Q3 = get_quantile_value(df, column, 0.75)
+    
+    with st.expander(f"See benign quantiles for {label}"):
+        st.write(f"{label} - 25% < {Q1:.4f}")
+        st.write(f"{label} - 50% < {median:.4f}")
+        st.write(f"{label} - 75% < {Q3:.4f}")
 
 def show():
     st.title("Breast Cancer Prediction")
-
     st.header("Enter the following data:")
+
+    # Assurez-vous que le DataFrame est chargé
+    df = breast_cancer
 
     # Input fields for the mean values
     st.subheader("Mean Values")
-    radius_mean = st.number_input("Radius Mean", min_value=0.0, format="%.2f")
-    texture_mean = st.number_input("Texture Mean", min_value=0.0, format="%.2f")
-    perimeter_mean = st.number_input("Perimeter Mean", min_value=0.0, format="%.2f")
-    area_mean = st.number_input("Area Mean", min_value=0.0, format="%.2f")
-    smoothness_mean = st.number_input("Smoothness Mean", min_value=0.0, format="%.4f")
-    compactness_mean = st.number_input("Compactness Mean", min_value=0.0, format="%.4f")
-    concavity_mean = st.number_input("Concavity Mean", min_value=0.0, format="%.4f")
-    concave_points_mean = st.number_input("Concave Points Mean", min_value=0.0, format="%.4f")
-    symmetry_mean = st.number_input("Symmetry Mean", min_value=0.0, format="%.4f")
-    fractal_dimension_mean = st.number_input("Fractal Dimension Mean", min_value=0.0, format="%.4f")
-
-    # Input fields for the standard error values
-    st.subheader("Standard Error Values")
-    radius_se = st.number_input("Radius SE", min_value=0.0, format="%.4f")
-    texture_se = st.number_input("Texture SE", min_value=0.0, format="%.4f")
-    perimeter_se = st.number_input("Perimeter SE", min_value=0.0, format="%.4f")
-    area_se = st.number_input("Area SE", min_value=0.0, format="%.4f")
-    smoothness_se = st.number_input("Smoothness SE", min_value=0.0, format="%.4f")
-    compactness_se = st.number_input("Compactness SE", min_value=0.0, format="%.4f")
-    concavity_se = st.number_input("Concavity SE", min_value=0.0, format="%.4f")
-    concave_points_se = st.number_input("Concave Points SE", min_value=0.0, format="%.4f")
-    symmetry_se = st.number_input("Symmetry SE", min_value=0.0, format="%.4f")
-    fractal_dimension_se = st.number_input("Fractal Dimension SE", min_value=0.0, format="%.4f")
-
-    # Input fields for the worst values
-    st.subheader("Worst Values")
-    radius_worst = st.number_input("Radius Worst", min_value=0.0, format="%.2f")
-    texture_worst = st.number_input("Texture Worst", min_value=0.0, format="%.2f")
-    perimeter_worst = st.number_input("Perimeter Worst", min_value=0.0, format="%.2f")
-    area_worst = st.number_input("Area Worst", min_value=0.0, format="%.2f")
-    smoothness_worst = st.number_input("Smoothness Worst", min_value=0.0, format="%.4f")
-    compactness_worst = st.number_input("Compactness Worst", min_value=0.0, format="%.4f")
-    concavity_worst = st.number_input("Concavity Worst", min_value=0.0, format="%.4f")
-    concave_points_worst = st.number_input("Concave Points Worst", min_value=0.0, format="%.4f")
-    symmetry_worst = st.number_input("Symmetry Worst", min_value=0.0, format="%.4f")
-    fractal_dimension_worst = st.number_input("Fractal Dimension Worst", min_value=0.0, format="%.4f")
+    
+    for column in columns_list:
+        label = column.replace("_", " ").title()
+        create_number_input(label, df, column)
+        display_statistics(df, column, label)
 
     # Add a submit button
     if st.button("Submit"):
