@@ -1,4 +1,12 @@
 import streamlit as st
+import pandas as pd
+
+# Chargement des données
+url = 'https://raw.githubusercontent.com/MaskiVal/DataSets/main/cancer_breast.csv'
+breast_cancer = pd.read_csv(url)
+
+
+
 
 def show():
     st.title("Breast Cancer Prediction")
@@ -7,7 +15,12 @@ def show():
 
     # Input fields for the mean values
     st.subheader("Mean Values")
-    radius_mean = st.number_input("Radius Mean", min_value=0.0, format="%.2f")
+    radius_mean = st.number_input(
+        "Radius Mean", 
+        min_value=0.0, 
+        value=breast_cancer[breast_cancer['diagnosis'] == 'B'].drop(columns=["id", "Unnamed: 32","diagnosis"]).median()["radius_mean"], 
+        format="%.2f"
+    )    
     texture_mean = st.number_input("Texture Mean", min_value=0.0, format="%.2f")
     perimeter_mean = st.number_input("Perimeter Mean", min_value=0.0, format="%.2f")
     area_mean = st.number_input("Area Mean", min_value=0.0, format="%.2f")
