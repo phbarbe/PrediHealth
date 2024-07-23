@@ -4,10 +4,10 @@ from streamlit_option_menu import option_menu
 
 # Importing the different diseases
 import breast_cancer
-#import diabetes
-#import kidney_disease
+import diabetes
+import kidney_disease
 import liver_disease
-#import heart_disease
+import heart_disease
 
 #st.set_page_config(
 #    page_title="Predictions de maladies",
