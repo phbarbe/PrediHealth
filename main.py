@@ -6,7 +6,7 @@ from streamlit_option_menu import option_menu
 import breast_cancer
 #import diabetes
 #import kidney_disease
-#import liver_disease
+import liver_disease
 #import heart_disease
 
 #st.set_page_config(
