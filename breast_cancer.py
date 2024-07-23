@@ -101,6 +101,7 @@ def show():
         display_statistics(df, column, label)
 
     # Input fields for the other values
+    #st.subheader("Other Values")
     st.subheader("Other Values")
     for column in other_columns:
         label = column.replace("_", " ").title()
