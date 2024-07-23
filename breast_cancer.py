@@ -9,6 +9,7 @@ import numpy as np
 url = 'https://raw.githubusercontent.com/MaskiVal/DataSets/main/cancer_breast.csv'
 breast_cancer = pd.read_csv(url)
 
+
 # Colonnes à supprimer
 columns_to_drop = ['id', 'Unnamed: 32', 'diagnosis']
 
@@ -19,7 +20,16 @@ columns_to_drop = [col for col in columns_to_drop if col in breast_cancer.column
 columns_list = [col for col in breast_cancer.columns if col not in columns_to_drop]
 
 # Liste des colonnes avec p_value < 0.05
-kruskal_result_list = ['radius_mean', 'texture_mean', 'perimeter_mean', 'area_mean', 'smoothness_mean', 'compactness_mean', 'concavity_mean', 'concave points_mean', 'symmetry_mean', 'fractal_dimension_mean', 'radius_se', 'texture_se', 'perimeter_se', 'area_se', 'smoothness_se', 'compactness_se', 'concavity_se', 'concave points_se', 'symmetry_se', 'fractal_dimension_se', 'radius_worst', 'texture_worst', 'perimeter_worst', 'area_worst', 'smoothness_worst', 'compactness_worst', 'concavity_worst']
+kruskal_result_list = [
+    'perimeter_worst', 'radius_worst', 'area_worst', 
+    'concave points_worst', 'concave points_mean', 'perimeter_mean', 'area_mean', 
+    'concavity_mean', 'radius_mean', 'area_se', 'concavity_worst', 'perimeter_se', 
+    'radius_se', 'compactness_mean', 'compactness_worst', 'texture_worst', 
+    'concave points_se', 'texture_mean', 'concavity_se', 'smoothness_worst', 
+    'symmetry_worst', 'smoothness_mean', 'compactness_se', 'symmetry_mean', 
+    'fractal_dimension_worst', 'fractal_dimension_se', 'symmetry_se', 'smoothness_se', 
+    'texture_se', 'fractal_dimension_mean'
+]
 main_kruskal_result_list = kruskal_result_list[0:27]
 
 # Conversion de la colonne 'diagnosis' en float pour y
@@ -65,6 +75,12 @@ def display_statistics(df, column, label):
         st.write(f"{label} - 50% < {median:.4f}")
         st.write(f"{label} - 75% < {Q3:.4f}")
 
+# Colonnes pour les 8 valeurs principales
+top_8_columns = ['perimeter_worst', 'radius_worst', 'area_worst', 'concave points_worst', 'concave points_mean', 'perimeter_mean', 'area_mean', 'concavity_mean']
+
+# Colonnes pour les autres valeurs
+other_columns = ['radius_mean', 'area_se', 'concavity_worst', 'perimeter_se', 'radius_se', 'compactness_mean', 'compactness_worst', 'texture_worst', 'concave points_se', 'texture_mean', 'concavity_se', 'smoothness_worst', 'symmetry_worst', 'smoothness_mean', 'compactness_se', 'symmetry_mean', 'fractal_dimension_worst', 'fractal_dimension_se', 'symmetry_se']
+
 def show():
     st.title("Breast Cancer Prediction")
     st.header("Enter the following data:")
@@ -75,10 +91,18 @@ def show():
     # Dictionnaire pour stocker les valeurs saisies
     user_inputs = {}
 
-    # Input fields for the mean values
-    st.subheader("Mean Values")
-    
-    for column in main_kruskal_result_list:
+
+
+    # Input fields for the top 8 values
+    st.subheader("Top 8 Values")
+    for column in top_8_columns:
+        label = column.replace("_", " ").title()
+        user_inputs[column] = create_number_input(label, df, column)
+        display_statistics(df, column, label)
+
+    # Input fields for the other values
+    st.subheader("Other Values")
+    for column in other_columns:
         label = column.replace("_", " ").title()
         user_inputs[column] = create_number_input(label, df, column)
         display_statistics(df, column, label)
