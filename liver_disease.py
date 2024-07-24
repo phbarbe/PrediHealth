@@ -3,6 +3,7 @@ import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from imblearn.over_sampling import RandomOverSampler
+import seaborn as sns
 
 # Chargement des données
 url = 'https://raw.githubusercontent.com/phbarbe/PrediHealth/main/liver_disease.csv'
@@ -64,6 +65,31 @@ def show():
         input_data_df = pd.DataFrame([input_data], columns=X.columns)
         prediction = rf_model.predict(input_data_df)
         st.write(f"Prediction: {'A risque' if prediction[0] == 1 else 'Pas à risque'}")
+
+        # Créer le pairplot
+        pairplot = sns.pairplot(liver_disease, hue='Dataset', palette={1: '#10989c', 2: '#ef6763'}, plot_kws={'alpha':0.5}, corner=True)
+
+        # Modifier la couleur de fond de chaque axe
+        for ax in pairplot.axes.flatten():
+            if ax is not None:
+                ax.set_facecolor('#E3E3E3')
+
+        # Modifier la couleur de fond de la figure
+        pairplot.fig.patch.set_facecolor('#E3E3E3')
+
+        # Ajouter les données du patient examiné sur chaque graphique du pairplot
+        for i in range(pairplot.axes.shape[0]):
+            for j in range(i):  # Only iterate over the lower triangle
+                ax = pairplot.axes[i, j]
+                x_var = pairplot.x_vars[j]
+                y_var = pairplot.y_vars[i]
+                ax.scatter(input_data_df[x_var].values, input_data_df[y_var].values, color='yellow', s=100, edgecolor='#34495E', alpha=0.8)
+        
+        # Ajuster la taille de la figure pour qu'elle utilise toute la largeur
+        pairplot.fig.set_size_inches(18, 18)
+
+        # Afficher le graphique dans Streamlit
+        st.pyplot(pairplot)
 
 if __name__ == "__main__":
     show()
