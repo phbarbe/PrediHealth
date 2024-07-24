@@ -2,13 +2,15 @@ import pandas as pd
 import streamlit as st
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score
-import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# Définir la configuration de la page Streamlit
+st.set_page_config(layout="wide")
 
 # Chargement des données
 url = 'https://raw.githubusercontent.com/MaskiVal/DataSets/main/cancer_breast.csv'
 breast_cancer = pd.read_csv(url)
-
 
 # Colonnes à supprimer
 columns_to_drop = ['id', 'Unnamed: 32', 'diagnosis']
@@ -84,45 +86,80 @@ other_columns = ['radius_mean', 'area_se', 'concavity_worst', 'perimeter_se', 'r
 
 def show():
     st.title("Breast Cancer Prediction")
-    st.header("Enter the following data:")
 
-    # Assurez-vous que le DataFrame est chargé
-    df = breast_cancer
+    # Centrer les éléments en utilisant des colonnes
+    col1, col2, col3 = st.columns([1, 2, 1])
 
-    # Dictionnaire pour stocker les valeurs saisies
-    user_inputs = {}
+    with col2:
+        st.header("Enter the following data:")
 
+        # Assurez-vous que le DataFrame est chargé
+        df = breast_cancer
 
+        # Dictionnaire pour stocker les valeurs saisies
+        user_inputs = {}
 
-    # Input fields for the top 8 values
-    st.subheader("Top 8 Values")
-    for column in top_8_columns:
-        label = column.replace("_", " ").title()
-        user_inputs[column] = create_number_input(label, df, column)
-        display_statistics(df, column, label)
+        # Input fields for the top 8 values
+        st.subheader("Top 8 Values")
+        for column in top_8_columns:
+            label = column.replace("_", " ").title()
+            user_inputs[column] = create_number_input(label, df, column)
+            display_statistics(df, column, label)
 
-    # Input fields for the other values
-    #st.subheader("Other Values")
-    st.subheader("Other Values")
-    for column in other_columns:
-        label = column.replace("_", " ").title()
-        user_inputs[column] = create_number_input(label, df, column)
-        display_statistics(df, column, label)
+        # Input fields for the other values
+        st.subheader("Other Values")
+        for column in other_columns:
+            label = column.replace("_", " ").title()
+            user_inputs[column] = create_number_input(label, df, column)
+            display_statistics(df, column, label)
 
-    # Add a submit button
-    if st.button("Submit"):
-        st.write("Data submitted successfully!")
-        # Convertir les entrées utilisateur en DataFrame pour la prédiction
-        input_data = pd.DataFrame([user_inputs])
-        prediction = modelLR.predict(input_data)[0]
-        prediction_proba = modelLR.predict_proba(input_data)[0]
+    # Utiliser un conteneur pour afficher le pairplot sur toute la largeur
+    container = st.container()
 
-        # Afficher le résultat de la prédiction
-        result = 'Malignant' if prediction == 1 else 'Benign'
-        #st.write(f"The model predicts: **{result}** with a probability of {prediction_proba[prediction]:.2f}.")
-        st.write(f"The model predicts: **{result}** with a probability of {100*prediction_proba[prediction]:.2f}%.")
-        st.write(f"Disclaimer: This prediction is informative and does not replace a professional medical diagnosis.")
+    with container:
+        # Add a submit button
+        if st.button("Submit"):
+            st.write("Data submitted successfully!")
+            # Convertir les entrées utilisateur en DataFrame pour la prédiction
+            input_data = pd.DataFrame([user_inputs])
+            prediction = modelLR.predict(input_data)[0]
+            prediction_proba = modelLR.predict_proba(input_data)[0]
+
+            # Afficher le résultat de la prédiction
+            result = 'Malignant' if prediction == 1 else 'Benign'
+            st.write(f"The model predicts: **{result}** with a probability of {100*prediction_proba[prediction]:.2f}%.")
+            st.write(f"Disclaimer: This prediction is informative and does not replace a professional medical diagnosis.")
+
+            # Afficher le pairplot avec les données du patient examiné
+            # Créer un DataFrame 'cancer_breast_TOP8' ne conservant que les colonnes spécifiques
+            cancer_breast_TOP8 = breast_cancer[['diagnosis', 'perimeter_worst', 'radius_worst', 'area_worst', 'concave points_worst', 'concave points_mean', 'perimeter_mean', 'area_mean', 'concavity_mean']]
+            
+            # Créer le pairplot
+            pairplot = sns.pairplot(cancer_breast_TOP8, hue='diagnosis', palette={'B': '#10989c', 'M': '#ef6763'}, plot_kws={'alpha':0.5}, corner=True)
+
+            # Modifier la couleur de fond de chaque axe
+            for ax in pairplot.axes.flatten():
+                if ax is not None:
+                    ax.set_facecolor('#E3E3E3')
+
+            # Modifier la couleur de fond de la figure
+            pairplot.fig.patch.set_facecolor('#E3E3E3')
+
+            # Ajouter les données du patient examiné sur chaque graphique du pairplot
+            for i in range(pairplot.axes.shape[0]):
+                for j in range(i):  # Only iterate over the lower triangle
+                    ax = pairplot.axes[i, j]
+                    x_var = pairplot.x_vars[j]
+                    y_var = pairplot.y_vars[i]
+                    ax.scatter(input_data[x_var].values, input_data[y_var].values, color='yellow', s=100, edgecolor='#34495E', alpha=0.8)
+            
+            # Ajuster la taille de la figure pour qu'elle utilise toute la largeur
+            pairplot.fig.set_size_inches(18, 18)
+
+            # Afficher le graphique dans Streamlit
+            st.pyplot(pairplot)
 
 if __name__ == "__main__":
     show()
+
 
