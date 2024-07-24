@@ -154,7 +154,7 @@ def show():
                     ax.scatter(input_data[x_var].values, input_data[y_var].values, color='yellow', s=100, edgecolor='#34495E', alpha=0.8)
             
             # Ajuster la taille de la figure pour qu'elle utilise toute la largeur
-            pairplot.fig.set_size_inches(18, 18)
+            pairplot.fig.set_size_inches(20, 20)
 
             # Afficher le graphique dans Streamlit
             st.pyplot(pairplot)
