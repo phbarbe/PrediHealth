@@ -10,7 +10,9 @@ st.set_page_config(layout="wide")
 
 # Chargement des données
 url = 'https://raw.githubusercontent.com/MaskiVal/DataSets/main/cancer_breast.csv'
+url = 'https://raw.githubusercontent.com/MaskiVal/DataSets/main/cancer_breast.csv'
 breast_cancer = pd.read_csv(url)
+
 
 # Colonnes à supprimer
 columns_to_drop = ['id', 'Unnamed: 32', 'diagnosis']
@@ -20,6 +22,36 @@ columns_to_drop = [col for col in columns_to_drop if col in breast_cancer.column
 
 # Liste des colonnes à conserver
 columns_list = [col for col in breast_cancer.columns if col not in columns_to_drop]
+
+# Liste des colonnes avec p_value < 0.05
+kruskal_result_list = [
+    'perimeter_worst', 'radius_worst', 'area_worst', 
+    'concave points_worst', 'concave points_mean', 'perimeter_mean', 'area_mean', 
+    'concavity_mean', 'radius_mean', 'area_se', 'concavity_worst', 'perimeter_se', 
+    'radius_se', 'compactness_mean', 'compactness_worst', 'texture_worst', 
+    'concave points_se', 'texture_mean', 'concavity_se', 'smoothness_worst', 
+    'symmetry_worst', 'smoothness_mean', 'compactness_se', 'symmetry_mean', 
+    'fractal_dimension_worst', 'fractal_dimension_se', 'symmetry_se', 'smoothness_se', 
+    'texture_se', 'fractal_dimension_mean'
+]
+main_kruskal_result_list = kruskal_result_list[0:27]
+
+# Conversion de la colonne 'diagnosis' en float pour y
+breast_cancer['diagnosis_float'] = breast_cancer['diagnosis'].apply(lambda x: 1 if x == 'M' else 0)
+
+# X = colonnes de cancer_breast étant dans kruskal_result_list
+X = breast_cancer[main_kruskal_result_list].select_dtypes('number')
+y = breast_cancer['diagnosis_float']
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=0.7, random_state=42, stratify=y)
+
+# Changement du poids des classes
+# class 0 ('Benin')
+class_weights = {0: 1, 1: 6}
+
+# Création et entraînement du modèle
+modelLR = LogisticRegression(random_state=42, class_weight=class_weights)
+modelLR.fit(X_train, y_train)
 
 # Liste des colonnes avec p_value < 0.05
 kruskal_result_list = [
@@ -62,6 +94,7 @@ def create_number_input(label, df, column, quantile=0.5, min_value=0.0, format="
     Crée un champ de saisie pour un nombre dans Streamlit avec une valeur par défaut basée sur le quantile spécifié.
     """
     value = get_quantile_value(df, column, quantile)
+    return st.number_input(label, min_value=min_value, value=value, format=format, key=column)
     return st.number_input(label, min_value=min_value, value=value, format=format, key=column)
 
 def display_statistics(df, column, label):
