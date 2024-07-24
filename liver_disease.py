@@ -46,7 +46,7 @@ def show():
     rf_model.fit(X_train_res, y_train_res)
 
     # Champs d'entrée pour les valeurs moyennes
-    st.subheader("Entrer les données du patient")
+    st.subheader("Enter patient data:")
 
     # Initialiser un dictionnaire pour stocker les entrées utilisateur
     user_input = {}
@@ -64,7 +64,9 @@ def show():
         input_data = [user_input[col] for col in X.columns]
         input_data_df = pd.DataFrame([input_data], columns=X.columns)
         prediction = rf_model.predict(input_data_df)
-        st.write(f"Prediction: {'A risque' if prediction[0] == 1 else 'Pas à risque'}")
+        st.write(f"Prediction: {'At risk' if prediction[0] == 1 else 'Not at risk'}")
+
+        st.write(f"Disclaimer: This prediction is informative and does not replace a professional medical diagnosis.")
 
         # Créer le pairplot
         pairplot = sns.pairplot(liver_disease, hue='Dataset', palette={1: '#10989c', 2: '#ef6763'}, plot_kws={'alpha':0.5}, corner=True)
