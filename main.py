@@ -4,10 +4,10 @@ from streamlit_option_menu import option_menu
 
 # Importing the different diseases
 import breast_cancer
-#import diabetes
-#import kidney_disease
-#import liver_disease
-#import heart_disease
+import diabetes
+import kidney_disease
+import liver_disease
+import heart_disease
 
 #st.set_page_config(
 #    page_title="Predictions de maladies",
@@ -89,4 +89,11 @@ elif selected == "Liver Disease":
 elif selected == "Heart Disease":
     heart_disease.show()
 elif selected == "select :":
-    st.write("Bienvenue sur notre application de prédiction de maladies !")
+    multi = """
+<h1 style='text-align: center; color: #34495E;'>Welcome to our disease prediction app!</h1>
+<h3 style='text-align: center; color: #74818E;'>This app is designed to predict the likelihood of a patient having a particular disease based on their medical history.</h3>
+<h2 style='text-align: center; color: #34495E;'>Please select a disease from the sidebar to get started.</h2>
+<h4 style='text-align: center; color: #74818E;'>Disclaimer: This app is for educational purposes only and does not replace a professional medical diagnosis.</h4>
+"""
+    st.markdown(multi, unsafe_allow_html=True)
+
