@@ -8,7 +8,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 # Chargement des données
-df = pd.read_csv('C:/Users/ahmed/OneDrive/Desktop/Mini_projet_festivale/maladie_cardiaque.csv')  # Remplacez par le chemin vers vos données
+df = pd.read_csv('https://raw.githubusercontent.com/phbarbe/PrediHealth/main/maladie_cardiaque.csv')  # Remplacez par le chemin vers vos données
 
 # Sélection explicite des colonnes pour X et y
 colonnes_X = ['age', 'sex', 'cp', 'trestbps', 'chol', 'fbs', 'restecg', 'thalach', 'exang', 'oldpeak', 'slope', 'ca', 'thal']
