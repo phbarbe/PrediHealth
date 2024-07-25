@@ -29,9 +29,6 @@ def show():
     X = df[['Age', 'Gender', 'Total_Bilirubin', 'Direct_Bilirubin', 'Alkaline_Phosphotase', 'Alamine_Aminotransferase', 'Aspartate_Aminotransferase', 'Total_Protiens', 'Albumin', 'Albumin_and_Globulin_Ratio']]
     y = df['Dataset']
 
-    # Convertir 'Gender' en variables numériques
-    X['Gender'] = X['Gender'].map({'Male': 1, 'Female': 0})
-
     # Initialiser le RandomOverSampler
     ros = RandomOverSampler(random_state=42)
 
@@ -40,6 +37,10 @@ def show():
 
     # Diviser le dataset en ensembles d'entraînement et de test
     X_train_res, X_test_res, y_train_res, y_test_res = train_test_split(X_res, y_res, test_size=0.3, random_state=42)
+
+    st.write('You can test on this following data or enter your proper data:')
+    st.write('Test Dataset')
+    st.write(X_test_res)
 
     # Entraîner le modèle RandomForest
     rf_model = RandomForestClassifier(random_state=42)
