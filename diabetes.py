@@ -61,7 +61,11 @@ def show():
         input_data = [user_input[col] for col in X.columns]
         input_data_df = pd.DataFrame([input_data], columns=X.columns)
         prediction = modelGB.predict(input_data_df)
+        prediction_proba = modelGB.predict_proba(input_data_df)[0]
+
+        # Afficher les résultats
         st.write(f"Prediction: {'At risk' if prediction[0] == 1 else 'Not at risk'}")
+        st.write(f"Probability of being 'At risk': {prediction_proba[1] * 100:.2f}%")
 
         st.write(
             f"Disclaimer: This prediction is informative and does not replace a professional medical diagnosis."
@@ -100,7 +104,7 @@ def show():
                 )
 
         # Ajuster la taille de la figure pour qu'elle utilise toute la largeur
-        pairplot.fig.set_size_inches(18, 18)
+        pairplot.fig.set_size_inches(28, 28)
 
         # Afficher le graphique dans Streamlit
         st.pyplot(pairplot)
