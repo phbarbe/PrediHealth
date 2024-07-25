@@ -1,14 +1,17 @@
-import streamlit as st
-import numpy as np
 import pandas as pd
+import streamlit as st
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 import seaborn as sns
 import matplotlib.pyplot as plt
 
+# Définir la configuration de la page Streamlit
+st.set_page_config(layout="wide")
+
 # Chargement des données
-df = pd.read_csv('https://raw.githubusercontent.com/phbarbe/PrediHealth/main/maladie_cardiaque.csv')  # Remplacez par le chemin vers vos données
+url = ('https://raw.githubusercontent.com/phbarbe/PrediHealth/main/maladie_cardiaque.csv') # Remplacez par le chemin vers vos données
+df = pd.read_csv(url)
 
 # Sélection explicite des colonnes pour X et y
 colonnes_X = ['age', 'sex', 'cp', 'trestbps', 'chol', 'fbs', 'restecg', 'thalach', 'exang', 'oldpeak', 'slope', 'ca', 'thal']
@@ -56,50 +59,60 @@ def predire_maladie(model, scaler, user_input, feature_names):
     
     return prediction[0]
 
-# Liste des noms des caractéristiques
-feature_names = colonnes_X
-
 # Interface utilisateur Streamlit
 def show():
-    st.title('Prédiction de Maladie avec RandomForest')
+    st.title("Prédiction de Maladie cardiaque")
 
-    # Créer des entrées utilisateur
-    user_inputs = {}
-    for feature in feature_names:
-        value = st.number_input(f'{feature}', value=0.0, step=0.01)
-        user_inputs[feature] = value
+    # Centrer les éléments en utilisant des colonnes
+    col1, col2, col3 = st.columns([1, 2, 1])
 
-    user_input_list = [user_inputs[feature] for feature in feature_names]
+    with col2:
+        st.header("Entrez les données suivantes:")
 
-    # Faire la prédiction
-    if st.button('Faire la prédiction'):
-        resultat = predire_maladie(model, scaler, user_input_list, feature_names)
-        st.write(f'La prédiction est : {"Maladie" if resultat == 1 else "Pas de Maladie"}')
+        # Dictionnaire pour stocker les valeurs saisies
+        user_inputs = {}
 
-        # Créer un pairplot avec les données
-        pairplot = sns.pairplot(df, hue='target', palette={1: '#10989c', 0: '#ef6763'}, plot_kws={'alpha':0.5}, corner=True)
-        
-        # Modifier la couleur de fond de chaque axe
-        for ax in pairplot.axes.flatten():
-            if ax is not None:
-                ax.set_facecolor('#E3E3E3')
+        # Créer des entrées utilisateur
+        for feature in colonnes_X:
+            user_inputs[feature] = st.number_input(f'{feature}', value=0.0, step=0.01)
 
-        # Modifier la couleur de fond de la figure
-        pairplot.fig.patch.set_facecolor('#E3E3E3')
+        user_input_list = [user_inputs[feature] for feature in colonnes_X]
 
-        # Ajouter les données du patient examiné sur chaque graphique du pairplot
-        for i in range(pairplot.axes.shape[0]):
-            for j in range(i):  # Only iterate over the lower triangle
-                ax = pairplot.axes[i, j]
-                x_var = pairplot.x_vars[j]
-                y_var = pairplot.y_vars[i]
-                ax.scatter(user_input_list[j], user_input_list[i], color='yellow', s=100, edgecolor='#34495E', alpha=0.8)
+    # Utiliser un conteneur pour afficher le pairplot sur toute la largeur
+    container = st.container()
 
-        # Ajuster la taille de la figure pour qu'elle utilise toute la largeur
-        pairplot.fig.set_size_inches(18, 18)
+    with container:
+        # Ajouter un bouton de soumission
+        if st.button("Faire la prédiction"):
+            st.write("Données soumises avec succès!")
+            # Faire la prédiction
+            resultat = predire_maladie(model, scaler, user_input_list, colonnes_X)
+            st.write(f"La prédiction est : {'Maladie' if resultat == 1 else 'Pas de Maladie'}")
 
-        # Afficher le graphique dans Streamlit
-        st.pyplot(pairplot)
+            # Créer un pairplot avec les données
+            pairplot = sns.pairplot(df, hue='target', palette={1: '#10989c', 0: '#ef6763'}, plot_kws={'alpha':0.5}, corner=True)
+            
+            # Modifier la couleur de fond de chaque axe
+            for ax in pairplot.axes.flatten():
+                if ax is not None:
+                    ax.set_facecolor('#E3E3E3')
+
+            # Modifier la couleur de fond de la figure
+            pairplot.fig.patch.set_facecolor('#E3E3E3')
+
+            # Ajouter les données du patient examiné sur chaque graphique du pairplot
+            for i in range(pairplot.axes.shape[0]):
+                for j in range(i):  # Only iterate over the lower triangle
+                    ax = pairplot.axes[i, j]
+                    x_var = pairplot.x_vars[j]
+                    y_var = pairplot.y_vars[i]
+                    ax.scatter(user_input_list[j], user_input_list[i], color='yellow', s=100, edgecolor='#34495E', alpha=0.8)
+
+            # Ajuster la taille de la figure pour qu'elle utilise toute la largeur
+            pairplot.fig.set_size_inches(18, 18)
+
+            # Afficher le graphique dans Streamlit
+            st.pyplot(pairplot)
 
 if __name__ == "__main__":
     show()
