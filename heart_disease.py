@@ -1,13 +1,10 @@
-import pandas as pd
 import streamlit as st
+import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 import seaborn as sns
 import matplotlib.pyplot as plt
-
-# Définir la configuration de la page Streamlit
-st.set_page_config(layout="wide")
 
 # Chargement des données
 url = ('https://raw.githubusercontent.com/phbarbe/PrediHealth/main/maladie_cardiaque.csv') # Remplacez par le chemin vers vos données
@@ -61,13 +58,13 @@ def predire_maladie(model, scaler, user_input, feature_names):
 
 # Interface utilisateur Streamlit
 def show():
-    st.title("Prédiction de Maladie cardiaque")
+    st.title("Heart disease prediction")
 
     # Centrer les éléments en utilisant des colonnes
     col1, col2, col3 = st.columns([1, 2, 1])
 
     with col2:
-        st.header("Entrez les données suivantes:")
+        st.header("Enter the following data:")
 
         # Dictionnaire pour stocker les valeurs saisies
         user_inputs = {}
@@ -83,11 +80,11 @@ def show():
 
     with container:
         # Ajouter un bouton de soumission
-        if st.button("Faire la prédiction"):
+        if st.button("Submit"):
             st.write("Données soumises avec succès!")
             # Faire la prédiction
             resultat = predire_maladie(model, scaler, user_input_list, colonnes_X)
-            st.write(f"La prédiction est : {'Maladie' if resultat == 1 else 'Pas de Maladie'}")
+            st.write(f"Prediction : {'At risk' if resultat == 1 else 'Not at risk'}")
 
             # Créer un pairplot avec les données
             pairplot = sns.pairplot(df, hue='target', palette={1: '#10989c', 0: '#ef6763'}, plot_kws={'alpha':0.5}, corner=True)
