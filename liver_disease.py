@@ -20,79 +20,85 @@ columns_list = [col for col in liver_disease.columns if col not in columns_to_dr
 
 def show():
     st.title("Liver Disease Prediction")
-    st.header("Enter the following data:")
-
-    # Assurez-vous que le DataFrame est chargé
-    df = liver_disease
-
-    # Préparation des données
-    X = df[['Age', 'Gender', 'Total_Bilirubin', 'Direct_Bilirubin', 'Alkaline_Phosphotase', 'Alamine_Aminotransferase', 'Aspartate_Aminotransferase', 'Total_Protiens', 'Albumin', 'Albumin_and_Globulin_Ratio']]
-    y = df['Dataset']
-
-    # Initialiser le RandomOverSampler
-    ros = RandomOverSampler(random_state=42)
-
-    # Resampler le dataset
-    X_res, y_res = ros.fit_resample(X, y)
-
-    # Diviser le dataset en ensembles d'entraînement et de test
-    X_train_res, X_test_res, y_train_res, y_test_res = train_test_split(X_res, y_res, test_size=0.3, random_state=42)
-
-    st.write('You can test on this following data or enter your proper data:')
-    st.write('Test Dataset')
-    st.write(X_test_res)
-
-    # Entraîner le modèle RandomForest
-    rf_model = RandomForestClassifier(random_state=42)
-    rf_model.fit(X_train_res, y_train_res)
-
-    # Champs d'entrée pour les valeurs moyennes
-    st.subheader("Enter patient data:")
-
-    # Initialiser un dictionnaire pour stocker les entrées utilisateur
-    user_input = {}
     
-    for column in columns_list:
-        label = column.replace("_", " ").title()
-        if column == 'Gender':
-            user_input[column] = st.selectbox(label, [0, 1], format_func=lambda x: 'Male' if x == 1 else 'Female', key=column)
-        else:
-            user_input[column] = st.number_input(label, format="%.2f", key=column)
+    # Centrer les éléments en utilisant des colonnes
+    col1, col2, col3 = st.columns([1, 2, 1])
 
-    # Ajouter un bouton de soumission
-    if st.button("Submit"):
-        # Préparer les données d'entrée pour la prédiction
-        input_data = [user_input[col] for col in X.columns]
-        input_data_df = pd.DataFrame([input_data], columns=X.columns)
-        prediction = rf_model.predict(input_data_df)
-        st.write(f"Prediction: {'At risk' if prediction[0] == 1 else 'Not at risk'}")
+    with col2:
 
-        st.write(f"Disclaimer: This prediction is informative and does not replace a professional medical diagnosis.")
+        st.header("Enter the following data:")
 
-        # Créer le pairplot
-        pairplot = sns.pairplot(liver_disease, hue='Dataset', palette={1: '#10989c', 2: '#ef6763'}, plot_kws={'alpha':0.5}, corner=True)
+        # Assurez-vous que le DataFrame est chargé
+        df = liver_disease
 
-        # Modifier la couleur de fond de chaque axe
-        for ax in pairplot.axes.flatten():
-            if ax is not None:
-                ax.set_facecolor('#E3E3E3')
+        # Préparation des données
+        X = df[['Age', 'Gender', 'Total_Bilirubin', 'Direct_Bilirubin', 'Alkaline_Phosphotase', 'Alamine_Aminotransferase', 'Aspartate_Aminotransferase', 'Total_Protiens', 'Albumin', 'Albumin_and_Globulin_Ratio']]
+        y = df['Dataset']
 
-        # Modifier la couleur de fond de la figure
-        pairplot.fig.patch.set_facecolor('#E3E3E3')
+        # Initialiser le RandomOverSampler
+        ros = RandomOverSampler(random_state=42)
 
-        # Ajouter les données du patient examiné sur chaque graphique du pairplot
-        for i in range(pairplot.axes.shape[0]):
-            for j in range(i):  # Only iterate over the lower triangle
-                ax = pairplot.axes[i, j]
-                x_var = pairplot.x_vars[j]
-                y_var = pairplot.y_vars[i]
-                ax.scatter(input_data_df[x_var].values, input_data_df[y_var].values, color='yellow', s=100, edgecolor='#34495E', alpha=0.8)
+        # Resampler le dataset
+        X_res, y_res = ros.fit_resample(X, y)
+
+        # Diviser le dataset en ensembles d'entraînement et de test
+        X_train_res, X_test_res, y_train_res, y_test_res = train_test_split(X_res, y_res, test_size=0.3, random_state=42)
+
+        #st.write('You can test on this following data or enter your proper data:')
+        #st.write('Test Dataset')
+        #st.write(X_test_res)
+
+        # Entraîner le modèle RandomForest
+        rf_model = RandomForestClassifier(random_state=42)
+        rf_model.fit(X_train_res, y_train_res)
+
+        # Champs d'entrée pour les valeurs moyennes
+        st.subheader("Enter patient data:")
+
+        # Initialiser un dictionnaire pour stocker les entrées utilisateur
+        user_input = {}
         
-        # Ajuster la taille de la figure pour qu'elle utilise toute la largeur
-        pairplot.fig.set_size_inches(18, 18)
+        for column in columns_list:
+            label = column.replace("_", " ").title()
+            if column == 'Gender':
+                user_input[column] = st.selectbox(label, [0, 1], format_func=lambda x: 'Male' if x == 1 else 'Female', key=column)
+            else:
+                user_input[column] = st.number_input(label, format="%.2f", key=column)
 
-        # Afficher le graphique dans Streamlit
-        st.pyplot(pairplot)
+        # Ajouter un bouton de soumission
+        if st.button("Submit"):
+            # Préparer les données d'entrée pour la prédiction
+            input_data = [user_input[col] for col in X.columns]
+            input_data_df = pd.DataFrame([input_data], columns=X.columns)
+            prediction = rf_model.predict(input_data_df)
+            st.write(f"Prediction: {'At risk' if prediction[0] == 1 else 'Not at risk'}")
+
+            st.write(f"Disclaimer: This prediction is informative and does not replace a professional medical diagnosis.")
+
+            # Créer le pairplot
+            pairplot = sns.pairplot(liver_disease, hue='Dataset', palette={1: '#10989c', 2: '#ef6763'}, plot_kws={'alpha':0.5}, corner=True)
+
+            # Modifier la couleur de fond de chaque axe
+            for ax in pairplot.axes.flatten():
+                if ax is not None:
+                    ax.set_facecolor('#E3E3E3')
+
+            # Modifier la couleur de fond de la figure
+            pairplot.fig.patch.set_facecolor('#E3E3E3')
+
+            # Ajouter les données du patient examiné sur chaque graphique du pairplot
+            for i in range(pairplot.axes.shape[0]):
+                for j in range(i):  # Only iterate over the lower triangle
+                    ax = pairplot.axes[i, j]
+                    x_var = pairplot.x_vars[j]
+                    y_var = pairplot.y_vars[i]
+                    ax.scatter(input_data_df[x_var].values, input_data_df[y_var].values, color='yellow', s=100, edgecolor='#34495E', alpha=0.8)
+            
+            # Ajuster la taille de la figure pour qu'elle utilise toute la largeur
+            pairplot.fig.set_size_inches(18, 18)
+
+            # Afficher le graphique dans Streamlit
+            st.pyplot(pairplot)
 
 if __name__ == "__main__":
     show()
