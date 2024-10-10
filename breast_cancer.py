@@ -5,8 +5,6 @@ from sklearn.model_selection import train_test_split
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-# Définir la configuration de la page Streamlit
-st.set_page_config(layout="wide")
 
 # Chargement des données
 url = 'https://raw.githubusercontent.com/MaskiVal/DataSets/main/cancer_breast.csv'

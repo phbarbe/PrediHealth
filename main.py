@@ -1,4 +1,11 @@
 import streamlit as st
+st.set_page_config(
+    page_title="Predictions de maladies",
+    page_icon="images/Logo_PrediHealth.png",
+    layout="wide",
+    initial_sidebar_state="expanded",
+)
+
 import base64
 from streamlit_option_menu import option_menu
 
@@ -8,13 +15,6 @@ import diabetes
 import kidney_disease
 import liver_disease
 import heart_disease
-
-st.set_page_config(
-    page_title="Predictions de maladies",
-    page_icon="images/Logo_PrediHealth.png",
-    layout="wide",
-    initial_sidebar_state="expanded",
-)
 
 # mettre une image en fond d'écran
 def get_base64(bin_file):
