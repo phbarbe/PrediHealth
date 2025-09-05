@@ -48,7 +48,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=0.7, random
 class_weights = {0: 1, 1: 6}
 
 # Création et entraînement du modèle
-modelLR = LogisticRegression(random_state=42, class_weight=class_weights)
+modelLR = LogisticRegression(random_state=42, class_weight=class_weights, max_iter=1000)
 modelLR.fit(X_train, y_train)
 
 # Liste des colonnes avec p_value < 0.05
@@ -78,7 +78,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=0.7, random
 class_weights = {0: 1, 1: 6}
 
 # Création et entraînement du modèle
-modelLR = LogisticRegression(random_state=42, class_weight=class_weights)
+modelLR = LogisticRegression(random_state=42, class_weight=class_weights, max_iter=1000)
 modelLR.fit(X_train, y_train)
 
 def get_quantile_value(df, column, quantile):
